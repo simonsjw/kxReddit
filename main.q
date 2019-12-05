@@ -1,35 +1,51 @@
-// load libraries
-\l /home/simon/developer/data/workspace/__nouser__/simon/reddit/libs/dbmaint/dbmaint.q
-\l /home/simon/developer/data/workspace/__nouser__/simon/reddit/libs/dbSttngs/dbSttngs.q
-\l /home/simon/developer/data/workspace/__nouser__/simon/reddit/libs/dTr/dTr.q
-\l /home/simon/developer/data/workspace/__nouser__/simon/reddit/libs/fT/fT.q
-\l /home/simon/developer/data/workspace/__nouser__/simon/reddit/libs/hBr/hBr.q
-\l /home/simon/developer/data/workspace/__nouser__/simon/reddit/libs/log4q/log4q.q
+// set the qhome path. 
+qhome: hsym `$"/home/simon/developer/data/workspace/__nouser__/reddit"
 
-// load DataLoader process.
-\l /home/simon/developer/data/workspace/__nouser__/simon/reddit/pDataLoader/ingst/ingst.q
-\l /home/simon/developer/data/workspace/__nouser__/simon/reddit/pDataLoader/pDataLoader.q
 
-// load hdb
+loadRel:{[qhome;relPath]
+    qhome: string qhome;
+    qhome:(-1*((count qhome)-1))#qhome;
+    relPath: string relPath;
+    relPath:(-1*((count relPath)-1))#relPath;
+    
+    sPath:"l ", ("/" sv ( qhome; relPath));
+    system sPath, .z.x 0; 
+    }
+
+// load up the library paths relative to home. 
+libPths:(hsym `$"kxReddit/libs/dbmaint/dbmaint.q";
+    hsym `$"kxReddit/libs/dbSttngs/dbSttngs.q";
+    hsym `$"kxReddit/libs/dTr/dTr.q";
+    hsym `$"kxReddit/libs/fT/fT.q";
+    hsym `$"kxReddit/libs/hBr/hBr.q";
+    hsym `$"kxReddit/libs/log4q/log4q.q"
+    );
+
+// load each library.
+loadRel[qhome;] each libPths;
+
+// load up the process paths relative to home. 
+prPths:(hsym `$"kxReddit/pDataLoader/ingst/ingst.q";
+    hsym `$"kxReddit/pDataLoader/pDataLoader.q"
+    );
+
+// load each library.
+loadRel[qhome;] each prPths;
+
+// load hdb.
 \l /import/redditdb
+
 
 // load database structure.
 .dbSttngs.dbStructure[];
 .dbSttngs.build[];
 
-// .Q.fsn takes a big file (given in the second argument) and breaks it into chunks not bigger than the 3rd
-// argument by going to the first \n found before going over that 3rd argument size. It then passes each chunk to the function defined in the first argument. 
-// Each 'chunk' is a vector of elements delimited by \n. Here tVals itterates (I did not say loops!) over that \n delimited vector of elements.
 
-
-// // if the partition exists, then delete it. 
-// exists:{[fileHandle] not () ~ key fileHandle}
-// $[.hb.exists[hsym `$"/import/RS_201334-11s"];;]
 sinkTbl:`RS;
-source: hsym `$"/import/RS_2014-11s";
+source: hsym `$"/import/RS_2014-11";
 
 
-.io.processRedditFile[source;sinkTbl];
+.pDataLoader.processRedditFile[source;sinkTbl];
 
 
 

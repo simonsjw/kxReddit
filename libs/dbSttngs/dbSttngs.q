@@ -1,5 +1,5 @@
-// import the hdb (needed for writing new dbTable).
-\l /import/redditdb
+//@TODO check the hdb is imported! (needed for writing new dbTable).
+
 
 \d .dbSttngs
 dbStructure:{
