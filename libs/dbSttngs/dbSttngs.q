@@ -3,7 +3,6 @@
 
 \d .dbSttngs
 dbStructure:{
-
     .fileStrct.dbdir: hsym `$"/import/redditdb";
     .fileStrct.inputdir: hsym `$"/import";
     .dbSttngs.partitionCol: (enlist `RS)!(enlist `created);

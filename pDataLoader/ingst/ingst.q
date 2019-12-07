@@ -19,6 +19,7 @@ ingest.SetDefaultColmns:{[mnth;dataTbl]
 
     applyFunction:{[defaultColSettings;dataTbl]
     // this is the component needing refactoring
+        DEBUG ("[kxReddit]{ingest.SetDefaultColmns;applyFunction} Apply the function %1.";defaultColSettings[`lstFn]);
         fn: value defaultColSettings[`lstFn];                                                                           // perform update
         $[defaultColSettings[`lstFn]~".hBr.castFn";
             eRsltDict:fn [defaultColSettings[`lstCol];dataTbl;defaultColSettings[`lstCast]];
@@ -44,7 +45,7 @@ ingest.setUnknownColmns:{[mnth;dataTbl]
     lstCol:raze {(count x[`fn])#x[`colmn]} each allRecs;
     lstUnknownCols:asc (cols dataTbl) where not (cols dataTbl) in lstCol;
     unknownsTbl:?[dataTbl;();0b;(lstUnknownCols)!(lstUnknownCols)];
-    /build the swamp column - a column containing remaining fields to be explored.
+    DEBUG "[kxReddit]{ingest.setUnknownColmn} build the swamp column - a column containing remaining fields to be explored.";
     / Add those to dataTbl.
     ls:{(enlist((flip y)[;x]))}[;unknownsTbl] each  til count unknownsTbl;
     ![dataTbl;();0b;(enlist `swamp)!(enlist `ls)];
@@ -78,7 +79,7 @@ ingest.writeNewDataToDisk:{[tempTbl;sinkTbl]
     otherCols: asc allCols where ((not (allCols = f)) and (not (allCols = `swamp)));    
     allCols:f,otherCols,`swamp;
 //     allCols:f,otherCols,`swamp`swampKeys;
-    
+    DEBUG("[kxReddit] Perform upsert of columns %1.";allCols);
     t upsert .Q.en[d;?[tempTbl;();0b;(allCols)!(allCols)]];
     delete tempTbl from `.tmp;
 

@@ -1,6 +1,5 @@
-// set the qhome path. 
-qhome: hsym `$"/home/simon/developer/data/workspace/__nouser__/reddit"
 
+qhome: hsym `$"/home/simon/developer/data/workspace/__nouser__/reddit"                  // set the qhome path. 
 
 loadRel:{[qhome;relPath]
     qhome: string qhome;
@@ -12,8 +11,7 @@ loadRel:{[qhome;relPath]
     system sPath, .z.x 0; 
     }
 
-// load up the library paths relative to home. 
-libPths:(hsym `$"kxReddit/libs/dbmaint/dbmaint.q";
+libPths:(hsym `$"kxReddit/libs/dbmaint/dbmaint.q";                                      // load up the library paths relative to home. 
     hsym `$"kxReddit/libs/dbSttngs/dbSttngs.q";
     hsym `$"kxReddit/libs/dTr/dTr.q";
     hsym `$"kxReddit/libs/fT/fT.q";
@@ -24,31 +22,24 @@ libPths:(hsym `$"kxReddit/libs/dbmaint/dbmaint.q";
 // load each library.
 loadRel[qhome;] each libPths;
 
-// load up the process paths relative to home. 
-prPths:(hsym `$"kxReddit/pDataLoader/ingst/ingst.q";
+prPths:(hsym `$"kxReddit/pDataLoader/ingst/ingst.q";                                    // load up the process paths relative to home. 
     hsym `$"kxReddit/pDataLoader/pDataLoader.q"
     );
 
-// load each library.
-loadRel[qhome;] each prPths;
+loadRel[qhome;] each prPths;                                                            // load each library.
+
+.hBr.logInit[`:/import/kxLog.log];                                                       // Initialise the logger.
 
 // load hdb.
 \l /import/redditdb
 
-
-// load database structure.
-.dbSttngs.dbStructure[];
-.dbSttngs.build[];
-
+.dbSttngs.dbStructure[];                                                                // load database structure.
+// .dbSttngs.build[];
 
 sinkTbl:`RS;
 source: hsym `$"/import/RS_2014-11";
 
-
+INFO ("[kxReddit]{.pDataLoader.processRedditFile} Attempting import of %1 to %2 .";(string source;string sinkTbl))
 .pDataLoader.processRedditFile[source;sinkTbl];
 
 
-
-    
-    
-    
