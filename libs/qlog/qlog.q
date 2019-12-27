@@ -16,7 +16,6 @@ logger[`pSystemD]:{[x;y;z]
     SystemDLogState:`SILENT`DEBUG`INFO`WARN`ERROR`FATAL!("debug";"debug";"info";"warning";"err";"err");
     system "logger -p local0.",SystemDLogState[x]," '",y,"'"};
 
-
 buildMap:{
     .qlog.logMap:([lvl:()];fns:());
     0N!.qlog.logMap
@@ -28,13 +27,6 @@ buildMap:{
     LogFnBuilder':[.dbSttngs.logSinks];
     }
 
-// logMsg:{[lvl;msg]
-//     0N!lvl;
-//     0N!.qlog.logMap[lvl][`fns];
-//     fn:{x[y]};
-//     fnI:fn[;msg];
-//     fnI each .qlog.logMap[lvl][`fns];
-//     };
 logMsg:{[lvl;msg]
     fn:{x[y]}[;msg];
     fn each .qlog.logMap[lvl][`fns];
@@ -42,7 +34,11 @@ logMsg:{[lvl;msg]
 
 \d .
 
-.qlog.buildMap[];
-.qlog.logMsg[`INFO;"Simon"]
+ERROR:{[msg].qlog.logMsg[`SILENT;msg]};
+DEBUG:{[msg].qlog.logMsg[`DEBUG;msg]};
+INFO:{[msg].qlog.logMsg[`INFO;msg]};
+WARN:{[msg].qlog.logMsg[`WARN;msg]};
+ERROR:{[msg].qlog.logMsg[`ERROR;msg]};
+FATAL:{[msg].qlog.logMsg[`FATAL;msg]};
 
 

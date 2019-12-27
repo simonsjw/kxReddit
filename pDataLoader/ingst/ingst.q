@@ -19,7 +19,7 @@ ingest.SetDefaultColmns:{[mnth;dataTbl]
 
     applyFunction:{[defaultColSettings;dataTbl]
         fnString:defaultColSettings[`lstFn];
-        `.[`DEBUG] "[kxReddit][ingest.SetDefaultColmns][applyFunction] Apply the function.";
+        `DEBUG["[kxReddit][ingest.SetDefaultColmns][applyFunction] Apply the function."];
         fn: value fnString;                                                                           // perform update
         $[defaultColSettings[`lstFn]~".hBr.castFn";
             eRsltDict:fn [defaultColSettings[`lstCol];dataTbl;defaultColSettings[`lstCast]];
@@ -45,7 +45,7 @@ ingest.setUnknownColmns:{[mnth;dataTbl]
     lstCol:raze {(count x[`fn])#x[`colmn]} each allRecs;
     lstUnknownCols:asc (cols dataTbl) where not (cols dataTbl) in lstCol;
     unknownsTbl:?[dataTbl;();0b;(lstUnknownCols)!(lstUnknownCols)];
-    `.[`DEBUG] "[kxReddit][ingest.setUnknownColmn] build the swamp column - containing remaining undocumented fields.";
+    `DEBUG["[kxReddit][ingest.setUnknownColmn] build the swamp column - containing remaining undocumented fields."];
     / Add those to dataTbl.
     ls:{(enlist((flip y)[;x]))}[;unknownsTbl] each  til count unknownsTbl;
     ![dataTbl;();0b;(enlist `swamp)!(enlist `ls)];
@@ -79,10 +79,9 @@ ingest.writeNewDataToDisk:{[tempTbl;sinkTbl]
     otherCols: asc allCols where ((not (allCols = f)) and (not (allCols = `swamp)));    
     allCols:f,otherCols,`swamp;
 //     allCols:f,otherCols,`swamp`swampKeys;
-    `.[`DEBUG] raze string "[kxReddit] Perform upsert of columns. {allCols:",allCols,"}";
+    `DEBUG[raze string "[kxReddit] Perform upsert of columns. {allCols:",allCols,"}"];
     t upsert .Q.en[d;?[tempTbl;();0b;(allCols)!(allCols)]];
     delete tempTbl from `.tmp;
-
     };
 
 \d .

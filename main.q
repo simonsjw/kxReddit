@@ -42,6 +42,6 @@ loadRel[qhome;] each prPths;                                                    
 sinkTbl:`RS;
 source: hsym `$"/import/RS_2014-11s";
 
-.qlog.logMsg[`INFO; raze string "[kxReddit][.pDataLoader.processRedditFile] Attempting import. {source:",source," sinkTbl:",sinkTbl,"}"];
+DEBUG[raze string "[kxReddit][.pDataLoader.processRedditFile] Attempting import. {source:",source," sinkTbl:",sinkTbl,"}"];
 .pDataLoader.processRedditFile[source;sinkTbl];
 
