@@ -53,19 +53,29 @@ fQry:{
             [x]inner parse x
             };
     :write[x]
-    }
+    };
 
 // @kind function
 // @fileoverview logInit sets up logging to a local file and to systemctl. 
 // @param logPath {hsym} The file path to the local log file.
 // @return null {null} no value is returned.
 logInit:{[logPath]                                                                                                      // set up logging (event types: SILENT DEBUG INFO WARN ERROR FATAL)
-    .log4q.a[hopen logPath;`INFO`WARN`ERROR`FATAL];                                                                     // Add log to file.   
-    .log4q.a[(-334;{[x;y] system "logger -p local0.emerg ",y;}); `FATAL];                                               // Add log to systemctl. (map FATAL to emerg)
-    .log4q.a[(-334;{[x;y] system "logger -p local0.err ",y;}); `ERROR];                                                 // Add log to systemctl. (map ERROR to err)
-    .log4q.a[(-334;{[x;y] system "logger -p local0.warning ",y;}); `WARN];                                              // Add log to systemctl. (map WARN to warning)
-    .log4q.a[(-334;{[x;y] system "logger -p local0.info ",y;}); `INFO];                                                 // Add log to systemctl. (map INFO to info)
-    .log4q.a[(-334;{[x;y] system "logger -p local0.debug ",y;}); `DEBUG`SILENT];                                        // Add log to systemctl. (map DEBUG to debug. Note that SILENT is also mapped to DEBUG)                                             
+    .log4q.a[hopen logPath;`SILENT`DEBUG`INFO`WARN`ERROR`FATAL];                                                                     // Add log to file.   
+//     .log4q.a[(-334;{[x;y] system "logger -p local0.emerg ",y;}); `FATAL];                                               // Add log to systemctl. (map FATAL to emerg)
+//     .log4q.a[(-334;{[x;y] system "logger -p local0.err ",y;}); `ERROR];                                                 // Add log to systemctl. (map ERROR to err)
+//     .log4q.a[(-334;{[x;y] system "logger -p local0.warning ",y;}); `WARN];                                              // Add log to systemctl. (map WARN to warning)
+//     .log4q.a[(-334;{[x;y] system "logger -p local0.info ",y;}); `INFO];                                                 // Add log to systemctl. (map INFO to info)
+//     .log4q.a[(-334;{[x;y] system "logger -p local0.debug ",y;}); `DEBUG`SILENT];                                        // Add log to systemctl. (map DEBUG to debug. Note that SILENT is also mapped to DEBUG)                                             
     
     };
+
+
+logFmtFull:{
+    .log4q.fm: "%c\t[%p]:H=%h:PID[%i]:%d:%t:%f: %m\r\n";
+    };
+
+logFmtDefault:{
+    .log4q.fm: "%c\t[%p]:PID[%i]: %m\r\n";
+    };
+
 \d .

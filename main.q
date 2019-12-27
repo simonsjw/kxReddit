@@ -1,5 +1,5 @@
 
-qhome: hsym `$"/home/simon/developer/data/workspace/__nouser__/reddit"                  // set the qhome path. 
+qhome: hsym `$"/home/simon/developer/data/workspace/__nouser__/reddit";                  // set the qhome path. 
 
 loadRel:{[qhome;relPath]
     qhome: string qhome;
@@ -9,14 +9,15 @@ loadRel:{[qhome;relPath]
     
     sPath:"l ", ("/" sv ( qhome; relPath));
     system sPath, .z.x 0; 
-    }
+    };
 
 libPths:(hsym `$"kxReddit/libs/dbmaint/dbmaint.q";                                      // load up the library paths relative to home. 
     hsym `$"kxReddit/libs/dbSttngs/dbSttngs.q";
     hsym `$"kxReddit/libs/dTr/dTr.q";
     hsym `$"kxReddit/libs/fT/fT.q";
     hsym `$"kxReddit/libs/hBr/hBr.q";
-    hsym `$"kxReddit/libs/log4q/log4q.q"
+//     hsym `$"kxReddit/libs/log4q/log4q.q"
+    hsym `$"kxReddit/libs/qlog/qlog.q"
     );
 
 // load each library.
@@ -28,18 +29,19 @@ prPths:(hsym `$"kxReddit/pDataLoader/ingst/ingst.q";                            
 
 loadRel[qhome;] each prPths;                                                            // load each library.
 
-.hBr.logInit[`:/import/kxLog.log];                                                       // Initialise the logger.
 
 // load hdb.
 \l /import/redditdb
 
 .dbSttngs.dbStructure[];                                                                // load database structure.
-// .dbSttngs.build[];
+.dbSttngs.build[];
+.qlog.buildMap[];                                                                       // initialise the logger. 
+
+// .dTr.infltFiles[.fileStrct.inputdir];                                                // check input directory for zipped files and unzip them.
 
 sinkTbl:`RS;
-source: hsym `$"/import/RS_2014-11";
+source: hsym `$"/import/RS_2014-11s";
 
-INFO ("[kxReddit]{.pDataLoader.processRedditFile} Attempting import of %1 to %2 .";(string source;string sinkTbl))
+.qlog.logMsg[`INFO; raze string "[kxReddit][.pDataLoader.processRedditFile] Attempting import. {source:",source," sinkTbl:",sinkTbl,"}"];
 .pDataLoader.processRedditFile[source;sinkTbl];
-
 

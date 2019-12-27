@@ -9,7 +9,8 @@ dbStructure:{
     .dbSttngs.importChunkSize: (enlist `RS)!(enlist 1300000);
     .dbSttngs.removeCols: (enlist`RS)!(enlist `created_utc);
     .dbSttngs.defaultSymbolRatio: 0.7;
-    }
+    .dbSttngs.logSinks:([name:("Console";"SystemD";"Logfile")] sinkType:`pConsole`pSystemD`pSink; sinkTgt:(hsym `$"";hsym `$"";hsym `$":/import/log.txt");lvls:(`SILENT`DEBUG`INFO`WARN`ERROR`FATAL;`INFO`WARN`ERROR`FATAL;`DEBUG`INFO`WARN`ERROR`FATAL));
+        };
 
 // @kind function
 // @fileoverview Function creates the ProcessManager table, containing default values, with no input arguments. 
