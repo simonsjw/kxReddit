@@ -10,7 +10,6 @@ logger[`pStd]:{[x;y;z]
     outStates:`SILENT`DEBUG`INFO`WARN`ERROR`FATAL!(-1;-1;-1;-1;-2;-2);
     outStates[x] raze ("[",(string x),"]: ",string .z.P," ",y);
     };
-
 logger[`pConsole]:{[x;y;z]0N! raze ("[",(string x),"]: ",string .z.P," ",y)};
 logger[`pSystemD]:{[x;y;z]
     SystemDLogState:`SILENT`DEBUG`INFO`WARN`ERROR`FATAL!("debug";"debug";"info";"warning";"err";"err");
@@ -18,7 +17,6 @@ logger[`pSystemD]:{[x;y;z]
 
 buildMap:{
     .qlog.logMap:([lvl:()];fns:());
-    0N!.qlog.logMap
     LogFnBuilder:{[logSink]
         fn:{.qlog.logMap[x]:(enlist .qlog.logMap[x][`fns],.qlog.logger[y][x;;z])};
         fnItr:fn[;logSink[`sinkType];logSink[`sinkTgt]];

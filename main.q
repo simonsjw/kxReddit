@@ -16,7 +16,6 @@ libPths:(hsym `$"kxReddit/libs/dbmaint/dbmaint.q";                              
     hsym `$"kxReddit/libs/dTr/dTr.q";
     hsym `$"kxReddit/libs/fT/fT.q";
     hsym `$"kxReddit/libs/hBr/hBr.q";
-//     hsym `$"kxReddit/libs/log4q/log4q.q"
     hsym `$"kxReddit/libs/qlog/qlog.q"
     );
 
@@ -40,7 +39,7 @@ loadRel[qhome;] each prPths;                                                    
 // .dTr.infltFiles[.fileStrct.inputdir];                                                // check input directory for zipped files and unzip them.
 
 sinkTbl:`RS;
-source: hsym `$"/import/RS_2014-11s";
+source: hsym `$"/import/RS_2014-11";
 
 DEBUG[raze string "[kxReddit][.pDataLoader.processRedditFile] Attempting import. {source:",source," sinkTbl:",sinkTbl,"}"];
 .pDataLoader.processRedditFile[source;sinkTbl];
