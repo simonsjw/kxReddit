@@ -18,7 +18,20 @@ nukeDir:{[dirTarget]
         / hide power behind nuke
         nuke:(hdel each desc diR @); / desc sort!
         nuke[dirTarget];
-    }
+    };
+
+// @kind function
+// @fileoverview infltFiles itterates through files in a given directory and inflates any it recognises if they are compressed.
+// @param dir {hsym} A folder handle to check for compressed files. 
+// @return null
+infltFiles:{[dir]
+    f:{("/" sv (string dir;(string x))) except ":"};       // build file path from host directory (dir) and given file (x).
+    c:"bzip2 -d ",f;                                       // unzip filepath. 
+    fileSet: key dir;                                      // get list of files in directory. 
+    inflt:{[file]                                          // build function to inflate files using the right function for the right file type. 
+        $[("." vs (string file))[1]~"bz2";f[file];]
+        };
+    inflt each fileSet;};                                  // use the function to try and inflate each file. 
 
 // @kind function 
 // @fileoverview redditFileInfo returns information about a file path given a 

@@ -53,6 +53,7 @@ fQry:{
             [x]inner parse x
             };
     :write[x]
-    }
+    };
+
 
 \d .

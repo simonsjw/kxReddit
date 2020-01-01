@@ -18,8 +18,9 @@ ingest.SetDefaultColmns:{[mnth;dataTbl]
     lstTbl:raze {(count x[`fn])#x[`tbl]} each allRecs;
 
     applyFunction:{[defaultColSettings;dataTbl]
-    // this is the component needing refactoring
-        fn: value defaultColSettings[`lstFn];                                                                           // perform update
+        fnString:defaultColSettings[`lstFn];
+        fn: value fnString;                                                                           // perform update
+        `DEBUG[raze string "[kxReddit][.ingest.SetDefaultColmns][applyFunction] fn:",fnString,";col:",defaultColSettings[`lstCol]];
         $[defaultColSettings[`lstFn]~".hBr.castFn";
             eRsltDict:fn [defaultColSettings[`lstCol];dataTbl;defaultColSettings[`lstCast]];
             eRsltDict:fn [defaultColSettings[`lstCol];dataTbl]
@@ -44,17 +45,16 @@ ingest.setUnknownColmns:{[mnth;dataTbl]
     lstCol:raze {(count x[`fn])#x[`colmn]} each allRecs;
     lstUnknownCols:asc (cols dataTbl) where not (cols dataTbl) in lstCol;
     unknownsTbl:?[dataTbl;();0b;(lstUnknownCols)!(lstUnknownCols)];
-    /build the swamp column - a column containing remaining fields to be explored.
-    / Add those to dataTbl.
+    `DEBUG["[kxReddit][.ingest.setUnknownColmn] building the swamp column (undocumented fields)."];
+    // Add those to dataTbl.
     ls:{(enlist((flip y)[;x]))}[;unknownsTbl] each  til count unknownsTbl;
     ![dataTbl;();0b;(enlist `swamp)!(enlist `ls)];
     //now drop the unneeded columns
-    ![dataTbl;();0b;lstUnknownCols];
-    /build the swampKey column - a column containing keys to the swamp.
-    / Add those to dataTbl.
-//     ls:{cols first x} each (dataTbl[`swamp])
+    ![dataTbl;();0b;lstUnknownCols];    
+//  build the swampKey column - a column containing keys to the swamp.
+//  Add those to dataTbl.
+//     ls:{cols first x} each (dataTbl[`swamp]);
 //     ![dataTbl;();0b;(enlist `swampKeys)!(enlist `ls)];
-   
     :dataTbl
     }
 
@@ -70,18 +70,15 @@ ingest.writeNewDataToDisk:{[tempTbl;sinkTbl]
     p:`$string((first distinct select "m"$created from tempTbl)[.dbSttngs.partitionCol[sinkTbl]]);
     f:.dbSttngs.partitionCol[sinkTbl];
     t:hsym `$ raze string d,"/", p,"/",sinkTbl,"/";
-//     t:hsym `$ raze string d,"/", p,"/",`RS,"/";
     // set the sort order of the table to be laid down so that the partitioned column is up front, swamp is last and everything else is in between.
     allCols: cols tempTbl[];
-    
-//     otherCols: asc allCols where ((not (allCols = f)) and (not (allCols = `swamp)) and (not (allCols = `swampKeys)));
+ 
     otherCols: asc allCols where ((not (allCols = f)) and (not (allCols = `swamp)));    
+//     otherCols: asc allCols where ((not (allCols = f)) and (not (allCols = `swamp)) and (not (allCols = `swampKeys)));
     allCols:f,otherCols,`swamp;
 //     allCols:f,otherCols,`swamp`swampKeys;
-    
+    `DEBUG[raze string "[kxReddit][ingest.writeNewDataToDisk] Perform upsert of columns. {allCols:",(sv[";";string allCols]),"}"];
     t upsert .Q.en[d;?[tempTbl;();0b;(allCols)!(allCols)]];
-    delete tempTbl from `.tmp;
-
     };
 
 \d .
