@@ -51,8 +51,8 @@ ingest.setUnknownColmns:{[mnth;dataTbl]
     ![dataTbl;();0b;(enlist `swamp)!(enlist `ls)];
     //now drop the unneeded columns
     ![dataTbl;();0b;lstUnknownCols];    
-//  build the swampKey column - a column containing keys to the swamp.
-//  Add those to dataTbl.
+// build the swampKey column - a column containing keys to the swamp.
+// Add those to dataTbl.
 //     ls:{cols first x} each (dataTbl[`swamp]);
 //     ![dataTbl;();0b;(enlist `swampKeys)!(enlist `ls)];
     :dataTbl
@@ -70,7 +70,7 @@ ingest.writeNewDataToDisk:{[tempTbl;sinkTbl]
     p:`$string((first distinct select "m"$created from tempTbl)[.dbSttngs.partitionCol[sinkTbl]]);
     f:.dbSttngs.partitionCol[sinkTbl];
     t:hsym `$ raze string d,"/", p,"/",sinkTbl,"/";
-    // set the sort order of the table to be laid down so that the partitioned column is up front, swamp is last and everything else is in between.
+// set the sort order of the table to be laid down so that the partitioned column is up front, swamp is last and everything else is in between.
     allCols: cols tempTbl[];
  
     otherCols: asc allCols where ((not (allCols = f)) and (not (allCols = `swamp)));    

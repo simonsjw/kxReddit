@@ -73,8 +73,8 @@ build:{
     note:nRows#"";
     recDate: nRows#.z.p;
     recID:(neg nRows)?0Ng;
-    
-    `:/import/redditdb/tblProcessManager set (`tblProcessManager upsert ([process;args]fn;note;recDate;recID));
+    `tblProcessManager upsert ([process;args]fn;note;recDate;recID);
+     save `:/import/redditdb/tblProcessManager
     };
 
 \d .
