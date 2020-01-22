@@ -59,15 +59,15 @@ ingest.setUnknownColmns:{[mnth;dataTbl]
     }
 
 // @kind function
-// @fileoverview ingest.writeNewDataToDisk writes a given table to a given sink table on disk. The table is deleted
-// from memory after being written to disk.
+// @fileoverview ingest.writeNewDataToDisk writes a given table to a given sink table on disk. 
 // @param tempTbl {table} The table to be written to disk
 // @param dataTbl {table} the target table being written to.
 // @return null
 ingest.writeNewDataToDisk:{[tempTbl;sinkTbl]
     d:.fileStrct.dbdir;
-
     p:`$string((first distinct select "m"$created from tempTbl)[.dbSttngs.partitionCol[sinkTbl]]);
+    y:("." vs string p)[0];
+    d:hsym `$raze string d,"/",y;
     f:.dbSttngs.partitionCol[sinkTbl];
     t:hsym `$ raze string d,"/", p,"/",sinkTbl,"/";
 // set the sort order of the table to be laid down so that the partitioned column is up front, swamp is last and everything else is in between.

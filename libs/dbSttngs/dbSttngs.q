@@ -10,7 +10,7 @@ dbStructure:{
     .dbSttngs.removeCols: (enlist`RS)!(enlist `created_utc);
     .dbSttngs.defaultSymbolRatio: 0.7;
 //     .dbSttngs.logSinks:([name:("Console";"SystemD";"Logfile")] sinkType:`pConsole`pSystemD`pSink; sinkTgt:(hsym `$"";hsym `$"";hsym `$":/import/log.txt");lvls:(`SILENT`DEBUG`INFO`WARN`ERROR`FATAL;`INFO`WARN`ERROR`FATAL;`DEBUG`INFO`WARN`ERROR`FATAL));
-    .dbSttngs.logSinks:([name:("SystemD";"Logfile")] sinkType:`pSystemD`pSink; sinkTgt:(;hsym `$"";hsym `$":/import/log.txt");lvls:(`INFO`WARN`ERROR`FATAL;`DEBUG));
+    .dbSttngs.logSinks:([name:("SystemD";"Logfile")] sinkType:`pSystemD`pSink; sinkTgt:(hsym `$"";hsym `$":/import/log.txt");lvls:(`INFO`WARN`ERROR`FATAL;`DEBUG));
     
     };
 
@@ -46,7 +46,7 @@ build:{
         `tbl`colmn!`RS`created;
         `tbl`colmn!`RS`retrieved_on;
         `tbl`colmn!`RS`title);
-    fn:(enlist ".hBr.cleanChar";
+    fn:(enlist ".hBr.cleanCharSym";
         enlist ".hBr.cleanChar";
         enlist ".hBr.cleanChar";
         enlist ".hBr.cleanChar";
