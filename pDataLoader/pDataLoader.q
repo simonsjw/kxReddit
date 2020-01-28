@@ -3,17 +3,19 @@
 \d .pDataLoader
 
 importData:{[mnth;tempTbl;sinkTbl]
+    allRecs:?[`tblProcessManager;(enlist (=;`process;enlist `ingestion));0b;`tbl`colmn`fn`casting!((each;{x[`tbl]};`args);(each;{x[`colmn]};`args);`fn;(each;{x[`casting]};`args))];
+    allRecs: select from allRecs where (tbl=sinkTbl);                                               // get only the records for the target sinkTbl.
     `DEBUG[raze string "[kxReddit][.pDataLoader.ingest.SetDefaultColmns] Set the formats for the column defaults listed in tblProcessManager. {mnth:",mnth," sinkTbl:",sinkTbl,"}"];
-    tempTbl:.pDataLoader.ingest.SetDefaultColmns[mnth;tempTbl];             
+    tempTbl:.pDataLoader.ingest.SetDefaultColmns[mnth;tempTbl;sinkTbl;allRecs];             
     `DEBUG[raze string "[kxReddit][.pDataLoader.ingest.setUnknownColmns] Apply formatting to columns where default is not specified. {mnth:",mnth," sinkTbl:",sinkTbl,"}"];
-    tempTbl:.pDataLoader.ingest.setUnknownColmns[mnth;tempTbl];    
+    tempTbl:.pDataLoader.ingest.setUnknownColmns[mnth;tempTbl;sinkTbl;allRecs];    
     `DEBUG[raze string "[kxReddit][.pDataLoader.ingest.writeNewDataToDisk] Write the new data in .tmp.importTbl to disk. {mnth:",mnth," sinkTbl:",sinkTbl,"}"];
     .pDataLoader.ingest.writeNewDataToDisk[tempTbl;sinkTbl];                                                            
     };
 
 GetPartLsts: {[inlst;sinkTbl]
     `DEBUG[raze string "[kxReddit] Create the unique symbol to hold the table. {sinkTbl:", sinkTbl,"}"];
-    tmpname: (string sinkTbl),"_",(string first -1?0Ng);
+    tmpname: (string sinkTbl),"__",(string first -1?0Ng);
     .tmp.importTbl:`$".tmp.",tmpname;   
     `DEBUG[raze string "[kxReddit] Create an empty table.{.tmp.importTbl:",.tmp.importTbl,"}"];
     .tmp.importTbl set flip (distinct (raze key each inlst))!();                      
@@ -30,7 +32,7 @@ GetPartLsts: {[inlst;sinkTbl]
     .pDataLoader.importData[mnth;.tmp.importTbl;sinkTbl];
     `DEBUG["[kxReddit] Drop the tempTbl ",tmpname," from .tmp."];
     drp:![`.tmp;();0b;](),;                                                                                             // The table is deleted from memory after being written to disk.
-    drp[`$tmpname];
+    drp[`$tmpname];                                                                                                     // delete the objects in the tmp namespace and then the table specifically. 
     };
 
 ItterGetLst:{[x;sinkTbl]

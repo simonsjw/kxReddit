@@ -33,19 +33,19 @@ loadRel[qhome;] each prPths;                                                    
 load [hsym `$"/import/redditdb/tblProcessManager"];
 
 .dbSttngs.dbStructure[];                                                                // load database structure.
-.qlog.buildMap[];                                                                       // initialise the logger. 
 
+.qlog.buildMap[];                                                                       // initialise the logger. 
 // .dbSttngs.build[];                                                                   // rebuild tblProcessManager
 
-
-folder: hsym `$"/import/test";
-getSinkName:{`$x [til 2]}
-fn:.pDataLoader.processRedditFile;
+folder: hsym `$"/import/test";                                                          // provide the folder from which the data is imported. 
+getSinkName:{`$x [til 2]}                                                               // build a function to profide the table sink name given an input string. 
+fn:.pDataLoader.processRedditFile;                                                      // provide the function to be applied to the folder after unzipping. 
 
 DEBUG[raze string "[kxReddit][.pDataLoader.processRedditFile] Attempting import. {source folder ",folder,"}"];
-.fT.infltFilesRunFunc[folder;fn;getSinkName];
+.fT.infltFilesRunFunc[folder;fn;getSinkName];                                           // Carry out the unzipping and apply hte function with argument each time. 
 
 
+        
 
 
 

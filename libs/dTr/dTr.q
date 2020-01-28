@@ -33,6 +33,7 @@ floatToDateTime:{[colmn;tbl]
     :(enlist `d)!(enlist tbl)
     };
 
+
 // @kind function 
 // @fileoverview floatToDateTime_checked changes floating values to an equivalent UTC date/time if the UTC date/time
 //  is between 2005.01.01 and 2100.01.01. It does this by checking the first 10 values in the
@@ -66,13 +67,6 @@ cleanCharSymWTest:{[colmn;tbl]
     ![tbl;enlist (~\:;colmn;`symbol$());0b;(enlist colmn)!enlist (first;`$())];
     :(`d`r)!(tbl;r)
     };
-
-castFn:{[colmn;tbl;casting]
-//  col (symbol) is a column in table tbl (string).
-//  This function acts as an alias to allow standard casts. 
-    casting$tbl[colmn];
-    :(enlist `d)!(enlist tbl)
-    }
 
 // @kind function 
 // @fileoverview cleanCharSym first converts all 'false'(0b) boolean types to "". 

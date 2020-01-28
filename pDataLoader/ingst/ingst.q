@@ -7,30 +7,32 @@
 // @param mnth {month} The month (and year) of the partition the table will be added to.
 // @param dataTbl {table} the table to be restructured
 // @return array {table} the table after being restructured
-ingest.SetDefaultColmns:{[mnth;dataTbl]
+ingest.SetDefaultColmns:{[mnth;dataTbl;sinkTbl;allRecs]
 // select the relevant features to process via default data processing methods prior to import. 
-// @TODO this function needs refactoring so in general a dictionary of any key value pares is applied.
+// @TODO this function needs refactoring so in general a dictionary of any key value pairs is applied.
 // @TODO: change fn so that it takes argments for columns and table and checks against those in a dictionary in the args column in the tblProcessManager.
-    allRecs:?[`tblProcessManager;(enlist (=;`process;enlist `ingestion));0b;`tbl`colmn`fn`casting!((each;{x[`tbl]};`args);(each;{x[`colmn]};`args);`fn;(each;{x[`casting]};`args))];
-    lstCol:raze {(count x[`fn])#x[`colmn]} each allRecs;
-    lstCast:raze {(count x[`fn])#x[`casting]} each allRecs;
-    lstFn: raze allRecs[`fn];
-    lstTbl:raze {(count x[`fn])#x[`tbl]} each allRecs;
-
+    lstCol:raze {(count x[`fn])#x[`colmn]} each allRecs;                                            // get a list of columns needing action (same column more than once of more than one action).
+    lstCast:raze {(count x[`fn])#x[`casting]} each allRecs;                                         // get a list of any types needed for casting.
+    lstFn: raze allRecs[`fn];                                                                       // get a list of functions to be applied to the columns.
+    lstTbl:raze {(count x[`fn])#x[`tbl]} each allRecs;                                              // get a list of the sink table this will ultimately be applied to. 
+    
     applyFunction:{[defaultColSettings;dataTbl]
         fnString:defaultColSettings[`lstFn];
-        fn: value fnString;                                                                           // perform update
-        `DEBUG[raze string "[kxReddit][.ingest.SetDefaultColmns][applyFunction] fn:",fnString,";col:",defaultColSettings[`lstCol]];
-        $[defaultColSettings[`lstFn]~".hBr.castFn";
-            eRsltDict:fn [defaultColSettings[`lstCol];dataTbl;defaultColSettings[`lstCast]];
-            eRsltDict:fn [defaultColSettings[`lstCol];dataTbl]
+        $[defaultColSettings[`lstFn]~"castFn";;fn: value fnString];                                                                        // perform update
+        `DEBUG[raze string "[kxReddit][.ingest.SetDefaultColmns][applyFunction] fn:",fnString,";col:",defaultColSettings[`lstCol],"; rec count:", count dataTbl[defaultColSettings[`lstCol]]];
+        $[defaultColSettings[`lstFn]~"castFn";   
+            .[  // Try Catch on attempt to format column.
+                {[casting;castingCol;tbl] ![tbl;();0b;(enlist castingCol)!enlist (mmu;casting;castingCol)]};
+                (defaultColSettings[`lstCast]; defaultColSettings[`lstCol];dataTbl);
+                `DEBUG["casting not applied. Column datatype:", string type dataTbl[defaultColSettings[`lstCol]]]
+                ];  
+            dataTbl:(fn [defaultColSettings[`lstCol];dataTbl])[`d]
             ];
-        dataTbl: eRsltDict[`d];
-        
+//         dataTbl: eRsltDict[`d];
         :dataTbl
         };
     
-    applyFunction[;dataTbl] each ([]lstTbl;lstCol;lstFn;lstCast);
+    applyFunction[;dataTbl] each ([]lstTbl;lstCol;lstFn;lstCast);                                   // Create a table from each of the lists generated above and each row of the table for execution.
     :dataTbl
     };
 
@@ -40,17 +42,20 @@ ingest.SetDefaultColmns:{[mnth;dataTbl]
 // @param mnth {month} The month (and year) of the partition the table will be added to.
 // @param dataTbl {table} the table to be restructured
 // @return array {table} the table after being restructured
-ingest.setUnknownColmns:{[mnth;dataTbl]
-    allRecs:?[`tblProcessManager;(enlist (=;`process;enlist `ingestion));0b;`tbl`colmn`fn!((each;{x[`tbl]};`args);(each;{x[`colmn]};`args);`fn)];
+ingest.setUnknownColmns:{[mnth;dataTbl;sinkTbl;allRecs]
     lstCol:raze {(count x[`fn])#x[`colmn]} each allRecs;
     lstUnknownCols:asc (cols dataTbl) where not (cols dataTbl) in lstCol;
+    `DEBUG["[kxReddit][.ingest.setUnknownColmn] Unknown columns (lstUnknownCols): ",lstUnknownCols,"."];
     unknownsTbl:?[dataTbl;();0b;(lstUnknownCols)!(lstUnknownCols)];
     `DEBUG["[kxReddit][.ingest.setUnknownColmn] building the swamp column (undocumented fields)."];
     // Add those to dataTbl.
     ls:{(enlist((flip y)[;x]))}[;unknownsTbl] each  til count unknownsTbl;
     ![dataTbl;();0b;(enlist `swamp)!(enlist `ls)];
     //now drop the unneeded columns
-    ![dataTbl;();0b;lstUnknownCols];    
+    ![dataTbl;();0b;lstUnknownCols]; 
+    //now rename columns. 
+    
+    
 // build the swampKey column - a column containing keys to the swamp.
 // Add those to dataTbl.
 //     ls:{cols first x} each (dataTbl[`swamp]);
@@ -65,7 +70,7 @@ ingest.setUnknownColmns:{[mnth;dataTbl]
 // @return null
 ingest.writeNewDataToDisk:{[tempTbl;sinkTbl]
     d:.fileStrct.dbdir;
-    p:`$string((first distinct select "m"$created from tempTbl)[.dbSttngs.partitionCol[sinkTbl]]);
+    p:`$string("m"$first ?[tempTbl;();0b;()][.dbSttngs.partitionCol[sinkTbl]]);
     y:("." vs string p)[0];
     d:hsym `$raze string d,"/",y;
     f:.dbSttngs.partitionCol[sinkTbl];

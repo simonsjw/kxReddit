@@ -56,7 +56,23 @@ infltFilesRunFunc:{[dir;fn;getSinkName]                                     // x
         };
     inflt_xy: inflt[;dir;fn;getSinkName];
     inflt_xy each fileSet;                                                  // Unzip and apply function to each file.
-    }                      
+    }      
+
+
+infltFilesRunFuncTEST:{[dir]                                     // x is a string representing the file name of a file in the directory dir.                                   
+    fileSet: key dir;                                                       // get list of files in directory. 
+    inflt:{[file;dir]                                        // build function to inflate files using the right function for the right file type. 
+            f:{[file;dir]("/" sv (string dir;(string file))) except ":"};   // function f that builds file path from host directory (dir) and given file (x).
+            p:f[file;dir];                                                  // use f to create the file path
+            fileName:("." vs (string file))[0];                             // get the name of the file
+            fileType:("." vs (string file))[1];                             // get the type of the file                                             // use f to create the unzipped file path
+            `DEBUG[raze string "[kxReddit][.fT.infltFilesRunFunc] Attempting unzip {name",fileName," type:",fileType,"}"];
+            $[fileType~"bz2";0N!"bzip2 -d ",p;];                         // unzip if bz2 filepath. 
+            $[fileType~"xz";0N!"xz -d",p;];                              // unzip if xz filepath. 
+        };
+    inflt_xy: inflt[;dir];
+    inflt_xy each fileSet;                                                  // Unzip and apply function to each file.
+    } 
 
 // @kind function 
 // @fileoverview redditFileInfo returns information about a file path given a 
