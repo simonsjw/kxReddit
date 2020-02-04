@@ -24,56 +24,51 @@ build:{
     
     delete tblProcessManager from `.; 
     `tblProcessManager set ([process: `$(); args:()] fn:(); note:string(); recDate:`timestamp$();recID:`guid$());
+//RC: `gilded
+    
+//RS: `author`author_flair_css_class`author_flair_text`created_utc`distinguished`domain`edited`gilded`id`is_self`link_flair_css_class`link_flair_text`media`media_embed`num_comments
+    //`over_18`permalink`score`secure_media`secure_media_embed`selftext`stickied`subreddit`subreddit_id`thumbnail`title`url
 
-    args:(`tbl`colmn!`RS`name;
-        `tbl`colmn!`RS`author_flair_text;
-        `tbl`colmn!`RS`author_flair_css_class;
-        `tbl`colmn!`RS`link_flair_text;
-        `tbl`colmn!`RS`link_flair_css_class;
-        `tbl`colmn`casting!(`RS;`num_comments;"F");
-        `tbl`colmn`casting!(`RS;`score;"F");     
-        `tbl`colmn`casting!(`RS;`ups;"F");
-        `tbl`colmn`casting!(`RS;`downs;"F");
-        `tbl`colmn`casting!(`RS;`over_18;"B");
-        `tbl`colmn`casting!(`RS;`stickied;"B");
-        `tbl`colmn`casting!(`RS;`created_utc;"P");
-        `tbl`colmn!`RS`selftext;
-        `tbl`colmn!`RS`distinguished;
-        `tbl`colmn!`RS`subreddit;
-        `tbl`colmn!`RS`domain;
-        `tbl`colmn!`RS`subreddit_id;
-        `tbl`colmn!`RS`author;
-        `tbl`colmn!`RS`edited;
-        `tbl`colmn!`RS`retrieved_on;
-        `tbl`colmn!`RS`title;
-        `tbl`colmn`casting!(`RC;`ups;"F");
-        `tbl`colmn!`RC`author_flair_text;
-        `tbl`colmn!`RC`author;
-        `tbl`colmn!`RC`name;
-        `tbl`colmn!`RC`author_flair_css_class;
-        `tbl`colmn`casting!(`RC;`created_utc;"P");
-        `tbl`colmn!`RC`id;
-        `tbl`colmn!`RC`retrieved_on;
-        `tbl`colmn`casting!(`RC;`score_hidden;"B");
-        `tbl`colmn`casting!(`RC;`edited;"B");
-        `tbl`colmn!`RC`subreddit;
-        `tbl`colmn!`RC`distinguished;
-        `tbl`colmn!`RC`parent_id;
-        `tbl`colmn!`RC`body;
-        `tbl`colmn`casting!(`RC;`controversiality;"F");
-        `tbl`colmn`casting!(`RC;`downs;"F");
-        `tbl`colmn!`RC`subreddit_id;
-        `tbl`colmn!`RC`link_id;
-        `tbl`colmn`casting!(`RC;`score;"F")
+
+    args:(`tbl`colmn!`RS`author_flair_text;             /
+        `tbl`colmn!`RS`author_flair_css_class;          /
+        `tbl`colmn!`RS`link_flair_text;                 /
+        `tbl`colmn!`RS`link_flair_css_class;            /
+        `tbl`colmn`casting!(`RS;`num_comments;"F");     /
+        `tbl`colmn`casting!(`RS;`score;"F");            /
+        `tbl`colmn`casting!(`RS;`over_18;"B");          /
+        `tbl`colmn`casting!(`RS;`stickied;"B");         /
+        `tbl`colmn`casting!(`RS;`created_utc;"P");      /
+        `tbl`colmn!`RS`selftext;                        /
+        `tbl`colmn!`RS`distinguished;                   /
+        `tbl`colmn!`RS`subreddit;                       /
+        `tbl`colmn!`RS`domain;                          /
+        `tbl`colmn!`RS`subreddit_id;                    /
+        `tbl`colmn!`RS`author;                          /
+        `tbl`colmn!`RS`edited;                          /                 
+        `tbl`colmn!`RS`title;                           /
+        
+        `tbl`colmn!`RC`author_flair_text;               /
+        `tbl`colmn!`RC`author;                          /
+        `tbl`colmn!`RC`author_flair_css_class;          /
+        `tbl`colmn!`RC`id;                              /
+        `tbl`colmn!`RC`retrieved_on;                    /
+        `tbl`colmn`casting!(`RC;`edited;"B");           /
+        `tbl`colmn!`RC`subreddit;                       /
+        `tbl`colmn!`RC`distinguished;                   /
+        `tbl`colmn!`RC`parent_id;                       /
+        `tbl`colmn!`RC`body;                            /
+        `tbl`colmn`casting!(`RC;`controversiality;"F"); /           
+        `tbl`colmn!`RC`subreddit_id;                    /
+        `tbl`colmn!`RC`link_id;                         /
+        `tbl`colmn`casting!(`RC;`score;"F")             /
         );
     
-    fn:(enlist ".hBr.cleanCharSym";
+    fn:(
         enlist ".hBr.cleanChar";
         enlist ".hBr.cleanChar";
         enlist ".hBr.cleanChar";
         enlist ".hBr.cleanChar";
-        enlist "castFn";
-        enlist "castFn";
         enlist "castFn";
         enlist "castFn";
         enlist "castFn";
@@ -86,23 +81,17 @@ build:{
         enlist ".hBr.cleanCharSym";
         enlist ".hBr.cleanCharSym";
         (".hBr.falseToNull";".hBr.floatToDateTime");
-        enlist ".hBr.floatToDateTime";
         enlist ".hBr.cleanChar";
-        enlist "castFn";
         enlist ".hBr.cleanChar";
         enlist ".hBr.cleanCharSym";
-        enlist ".hBr.cleanCharSym";
         enlist ".hBr.cleanChar";
-        enlist "castFn";
         enlist ".hBr.cleanChar";
         enlist ".hBr.floatToDateTime";
         enlist "castFn";
-        enlist "castFn";
         enlist ".hBr.cleanChar";
         enlist ".hBr.cleanChar";
         enlist ".hBr.cleanCharSym";
         enlist ".hBr.cleanChar";
-        enlist "castFn";
         enlist "castFn";
         enlist ".hBr.cleanCharSym";
         enlist ".hBr.cleanCharSym";

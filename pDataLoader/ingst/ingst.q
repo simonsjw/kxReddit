@@ -4,10 +4,9 @@
 // @fileoverview ingest.SetDefaultColmns sets the relevant features to process into columns in an hdb given a target datatable.
 // The function uses settings in tblProcessManager to determine the needed columns and their target data type.
 // If the colmn is found in the dictionary and the values don't match, the function isn't executed. This enables 'overloading' of functions.
-// @param mnth {month} The month (and year) of the partition the table will be added to.
 // @param dataTbl {table} the table to be restructured
 // @return array {table} the table after being restructured
-ingest.SetDefaultColmns:{[mnth;dataTbl;sinkTbl;allRecs]
+ingest.SetDefaultColmns:{[dataTbl;sinkTbl;allRecs]
 // select the relevant features to process via default data processing methods prior to import. 
 // @TODO this function needs refactoring so in general a dictionary of any key value pairs is applied.
 // @TODO: change fn so that it takes argments for columns and table and checks against those in a dictionary in the args column in the tblProcessManager.
@@ -39,10 +38,9 @@ ingest.SetDefaultColmns:{[mnth;dataTbl;sinkTbl;allRecs]
 // @kind function
 // @fileoverview ingest.setUnknownColmns captures the columns not specified in tblProcessManager and stores them as key
 // value pairs in a column 'swamp'.
-// @param mnth {month} The month (and year) of the partition the table will be added to.
 // @param dataTbl {table} the table to be restructured
 // @return array {table} the table after being restructured
-ingest.setUnknownColmns:{[mnth;dataTbl;sinkTbl;allRecs]
+ingest.setUnknownColmns:{[dataTbl;sinkTbl;allRecs]
     lstCol:raze {(count x[`fn])#x[`colmn]} each allRecs;
     lstUnknownCols:asc (cols dataTbl) where not (cols dataTbl) in lstCol;
     `DEBUG["[kxReddit][.ingest.setUnknownColmn] Unknown columns (lstUnknownCols): ",lstUnknownCols,"."];

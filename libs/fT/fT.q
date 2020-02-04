@@ -43,6 +43,7 @@ infltFiles:{[dir]                                                   // x is a st
 infltFilesRunFunc:{[dir;fn;getSinkName]                                     // x is a string representing the file name of a file in the directory dir.                                   
     fileSet: key dir;                                                       // get list of files in directory. 
     inflt:{[file;dir;fn;getSinkName]                                        // build function to inflate files using the right function for the right file type. 
+            if[fExists (hsym `$(string dir),"/STOP");:`STOP];               // stop importing this file if a "STOP" file is found in the import directory (case sensitive).
             f:{[file;dir]("/" sv (string dir;(string file))) except ":"};   // function f that builds file path from host directory (dir) and given file (x).
             p:f[file;dir];                                                  // use f to create the file path
             fileName:("." vs (string file))[0];                             // get the name of the file
@@ -62,6 +63,7 @@ infltFilesRunFunc:{[dir;fn;getSinkName]                                     // x
 infltFilesRunFuncTEST:{[dir]                                     // x is a string representing the file name of a file in the directory dir.                                   
     fileSet: key dir;                                                       // get list of files in directory. 
     inflt:{[file;dir]                                        // build function to inflate files using the right function for the right file type. 
+            if[fExists (hsym `$(string dir),"/STOP");:`stop];               // stop importing this file if a "STOP" file is found (case sensitive).
             f:{[file;dir]("/" sv (string dir;(string file))) except ":"};   // function f that builds file path from host directory (dir) and given file (x).
             p:f[file;dir];                                                  // use f to create the file path
             fileName:("." vs (string file))[0];                             // get the name of the file

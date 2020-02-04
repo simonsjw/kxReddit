@@ -45,8 +45,7 @@ buildMap:{                                                                      
     .qlog.logMap:([lvl:()];fns:());                                                                                 // this function will log individual log messages to targets specified for each log level. 
     LogFnBuilder:{[logSink]
         fn:{.qlog.logMap[x]:(enlist .qlog.logMap[x][`fns],.qlog.logger[y][x;;z])};
-        fnItr:fn[;logSink[`sinkType];logSink[`sinkTgt]];
-        fnItr'[logSink[`lvls]]
+        fn[;logSink[`sinkType];logSink[`sinkTgt]]'[logSink[`lvls]]
         };
     LogFnBuilder':[.dbSttngs.logSinks];
     }
