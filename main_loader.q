@@ -29,18 +29,23 @@ prPths:(hsym `$"kxReddit/pDataLoader/ingst/ingst.q";                            
 loadRel[qhome;] each prPths;                                                            // load each library.
 
 
-// load hdb.
-\l /import/redditdb
+// load process manager.
+load [hsym `$"/import/redditdb/tblProcessManager"];
 
 .dbSttngs.dbStructure[];                                                                // load database structure.
-.dbSttngs.build[];
+
 .qlog.buildMap[];                                                                       // initialise the logger. 
+// .dbSttngs.build[];                                                                   // rebuild tblProcessManager
 
-// .dTr.infltFiles[.fileStrct.inputdir];                                                // check input directory for zipped files and unzip them.
+folder: hsym `$"/import/test";                                                          // provide the folder from which the data is imported. 
+getSinkName:{`$x [til 2]}                                                               // build a function to profide the table sink name given an input string. 
+fn:.pDataLoader.processRedditFile;                                                      // provide the function to be applied to the folder after unzipping. 
 
-sinkTbl:`RS;
-source: hsym `$"/import/RS_2014-11";
+DEBUG[raze string "[kxReddit][.pDataLoader.processRedditFile] Attempting import. {source folder ",folder,"}"];
+.fT.infltFilesRunFunc[folder;fn;getSinkName];                                           // Carry out the unzipping and apply hte function with argument each time. 
 
-DEBUG[raze string "[kxReddit][.pDataLoader.processRedditFile] Attempting import. {source:",source," sinkTbl:",sinkTbl,"}"];
-.pDataLoader.processRedditFile[source;sinkTbl];
+
+        
+
+
 
