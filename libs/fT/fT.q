@@ -1,6 +1,17 @@
 
 \d .fT
 
+// @kind readme
+// @author simon.j.watson@gmail.com
+// @name .fileTools/README.md
+// @category fileTools
+// .fT (fileTools) contains tools related to manipulating the file system on which the hdb resides.
+// It contains the following items:
+//      - .hbr.fExists
+//      - .hbr.nukeDir
+//      - .hbr.redditFileInfo
+// @end
+
 // @kind function
 // @fileoverview fExists returns a True if the file specified in a file handle exists. Otherwise, it returns False.
 // @param x {hsym} A file/folder handle

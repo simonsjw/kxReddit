@@ -1,6 +1,21 @@
 
 \d .hBr
 
+// @kind readme
+// @author simon.j.watson@gmail.com
+// @name .dataTransform/README.md
+// @category .dataTransform
+// .hBr (homeBrew) contains tools related to manipulating data types with the intention of transforming mixed data columns to single kx compliant data types. 
+// @end
+
+
+// @kind function
+// @fileoverview allColTypes returns the types of every element in each feature of the datatable.
+// @param x {table} A table to be analysed
+// @return array {(string; (int))[]} an array of tuples where each sub list contains the name of a column and the data types found in that column.
+allColTypes:{[testTbl]{(y;distinct type each x[y])}[testTbl;] each cols testTbl};
+
+
 // @kind function 
 // @fileoverview falseToNull takes false elements in a column and transforms them to null (0b to 0n).
 // @param column {sym} A column to be transformed.

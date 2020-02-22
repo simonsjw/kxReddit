@@ -1,11 +1,14 @@
 
-\d .hBr
+\d .fQry
 
-// @kind function
-// @fileoverview allColTypes returns the types of every element in each feature of the datatable.
-// @param x {table} A table to be analysed
-// @return array {(string; (int))[]} an array of tuples where each sub list contains the name of a column and the data types found in that column.
-allColTypes:{[testTbl]{(y;distinct type each x[y])}[testTbl;] each cols testTbl};
+// @kind readme
+// @author simon.j.watson@gmail.com
+// @name .fQry/README.md
+// @category functional Query
+// The homeBrew namespace contains internal functions to aid Kdb object manipulation.  
+// It contains the following item:
+//      - .fQry.fQry
+// @end
 
 // @kind function 
 // @fileoverview fQry returns a functional select statement given a qSQL statement. 
