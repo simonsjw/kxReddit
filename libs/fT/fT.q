@@ -62,12 +62,11 @@ infltFilesRunFunc:{[dir;fn;getSinkName]                                     // x
             np:f[`$fileName;dir]                                              // use f to create the unzipped file path
             `DEBUG[raze string "[kxReddit][.fT.infltFilesRunFunc] Attempting unzip {name",fileName," type:",fileType,"}"];
             $[fileType~"bz2";system"bzip2 -d ",p;];                         // unzip if bz2 filepath. 
-            $[fileType~"xz";system"xz -d",p;];                              // unzip if xz filepath. 
+            $[fileType~"xz";system"xz -d ",p;];                              // unzip if xz filepath. 
             `DEBUG[raze string "[kxReddit][.fT.infltFilesRunFunc] Attempting to apply function. Table sink: ",getSinkName[fileName]];
             fn[`$np;getSinkName[fileName]];
         };
-    inflt_xy: inflt[;dir;fn;getSinkName];
-    inflt_xy each fileSet;                                                  // Unzip and apply function to each file.
+    inflt[;dir;fn;getSinkName] each fileSet;                                                  // Unzip and apply function to each file.
     }      
 
 
@@ -81,10 +80,9 @@ infltFilesRunFuncTEST:{[dir]                                     // x is a strin
             fileType:("." vs (string file))[1];                             // get the type of the file                                             // use f to create the unzipped file path
             `DEBUG[raze string "[kxReddit][.fT.infltFilesRunFunc] Attempting unzip {name",fileName," type:",fileType,"}"];
             $[fileType~"bz2";0N!"bzip2 -d ",p;];                         // unzip if bz2 filepath. 
-            $[fileType~"xz";0N!"xz -d",p;];                              // unzip if xz filepath. 
+            $[fileType~"xz";0N!"xz -d ",p;];                              // unzip if xz filepath. 
         };
-    inflt_xy: inflt[;dir];
-    inflt_xy each fileSet;                                                  // Unzip and apply function to each file.
+    inflt[;dir] each fileSet;                                                  // Unzip and apply function to each file.
     } 
 
 // @kind function 

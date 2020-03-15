@@ -18,11 +18,16 @@
 // They are: 
 // |function &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|example &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp;|description &nbsp; &nbsp;|
 // |--------|-------|-----------|
-// |fileStruct.dbdir|hsym `` ` ``$"/import/redditdb"|a file handler pointing to the directory in which the hdb resides. |
-// |fileStruct.inputdir|hsym `` ` ``$"/import"|a file handler pointing to the directory in which any source data objects can be imported from. |
+// |fileStruct.dbDir|hsym `` ` ``$"/import/redditdb"|a file handler pointing to the directory in which the hdb resides. |
+// |fileStruct.inputDir|hsym `` ` ``$"/import"|a file handler pointing to the directory in which any source data objects can be imported from. |
 // |partitionCol|(enlist ```RS)!(enlist `` ` ``created)|a dictionary with table names as keys and then the partition field for those tables as values. |
 // |dbSettings.importChunkSize|(enlist `` ` ``RS)!(enlist 1300000)|a dictionary with table names as keys and the number of bits per import as values. |
 // |dbSettings.removeCols|(enlist `` ` ``RS)!(enlist `` ` ``created_utc)|a dictionary with table names as keys and the columns to be removed before writing to disk as values. |
+//
+// Each of these values can be overridden at the command line 
+//
+// An example of an argument to set up the 3 kinds of log sinks possible:
+//     .dbSttngs.logSinks:([name:("Console";"SystemD";"Logfile")] sinkType:`pConsole`pSystemD`pSink; sinkTgt:(hsym `$"";hsym `$"";hsym `$":/import/log.txt");lvls:(`SILENT`DEBUG`INFO`WARN`ERROR`FATAL;`INFO`WARN`ERROR`FATAL;`DEBUG`INFO`WARN`ERROR`FATAL));
 //
 // The function does not take or return arguments. 
 //
@@ -42,25 +47,65 @@
 
 
 dbStructure:{
-    .fileStrct.dbdir: hsym `$"/import/redditdb";
-    .fileStrct.inputdir: hsym `$"/import";
-    .dbSttngs.partitionCol: `RS`RC!`created_utc`created_utc;
-    .dbSttngs.importChunkSize: `RS`RC!(1300000;1300000);
-    .dbSttngs.removeCols: `RS`RC!`none`none;
-    .dbSttngs.defaultSymbolRatio: 0.7;
-//     .dbSttngs.logSinks:([name:("Console";"SystemD";"Logfile")] sinkType:`pConsole`pSystemD`pSink; sinkTgt:(hsym `$"";hsym `$"";hsym `$":/import/log.txt");lvls:(`SILENT`DEBUG`INFO`WARN`ERROR`FATAL;`INFO`WARN`ERROR`FATAL;`DEBUG`INFO`WARN`ERROR`FATAL));
+    
+    .fileStrct.dbDir: $[`cmdArgs[`dbDir]~();
+        hsym `$"/import/redditdb";
+        hsym `$`cmdArgs[`dbDir]];                                                                                       // Note we can't log this setting until after the logger is setup. 
 
-    .dbSttngs.logSinks:([name:("SystemD";"Logfile")] sinkType:`pSystemD`pSink; sinkTgt:(hsym `$"";hsym `$":/import/log.txt");lvls:(`INFO`WARN`ERROR`FATAL;`DEBUG));
+    pathLog: ((-1*(-1+(count string .fileStrct.dbDir)))#(string .fileStrct.dbDir)),"/log.txt"; 
+    defaultLogSttngs:([name:("SystemD";"Logfile")]                                                                      // set up log sinks
+        sinkType:`pSystemD`pSink; 
+        sinkTgt:(hsym `$"";hsym `$pathLog);
+        lvls:(`INFO`WARN`ERROR`FATAL`DEBUG;`INFO`WARN`ERROR`FATAL`DEBUG));
+    
+    .dbSttngs.logSinks: $[`cmdArgs[`logSinks]~();
+        defaultLogSttngs;
+        eval parse `cmdArgs[`logSinks]];
+    .qlog.buildMap[];                                                                                                   // initialise the logger. 
+    
+    `INFO[raze "[kxReddit][.dbSttings] .fileStrct.dbDir: ",string .fileStrct.dbDir];                                    // Now log previous variables.
+    `INFO["[kxReddit][.dbSttings] .dbSttngs.logSinks set."];  
+    
+    .fileStrct.inputDir: $[`cmdArgs[`inputDir]~();
+        hsym `$"/import";
+        hsym `$`cmdArgs[`inputDir]];
+    `INFO[raze "[kxReddit][.dbSttings] .fileStrct.inputDir: ", string .fileStrct.inputDir];
+    
+    .dbSttngs.partitionCol: $[`cmdArgs[`partitionCol]~();
+        `RS`RC!`created_utc`created_utc;
+        eval parse `cmdArgs[`partitionCol]];
+    `INFO[raze "[kxReddit][.dbSttings] .dbSttngs.partitionCol: ", raze ("," sv string each key .dbSttngs.partitionCol),"!",("," sv string each value .dbSttngs.partitionCol)];
+    
+    .dbSttngs.importChunkSize: $[`cmdArgs[`importChunkSize]~();
+        `RS`RC!(1300000;1300000);
+        eval parse `cmdArgs[`importChunkSize]];
+    `INFO["[kxReddit][.dbSttings] .dbSttngs.importChunkSize: ", raze ("," sv string each key .dbSttngs.importChunkSize),"!",("," sv string each value .dbSttngs.importChunkSize)];
+    
+    .dbSttngs.removeCols: $[`cmdArgs[`removeCols]~();
+        `RS`RC!`none`none;
+        eval parse `cmdArgs[`removeCols]];
+    `INFO["[kxReddit][.dbSttings] .dbSttngs.removeCols: ", raze ("," sv string each key .dbSttngs.removeCols),"!",("," sv string each value .dbSttngs.removeCols)];
+    
+    .dbSttngs.defaultSymbolRatio:$[`cmdArgs[`defaultSymbolRatio]~();
+        0.7;
+        "F"$`cmdArgs[`defaultSymbolRatio]];
+    `INFO["[kxReddit][.dbSttings] .dbSttngs.defaultSymbolRatio: ",string .dbSttngs.defaultSymbolRatio];
 
+    pathTblProcessManager: ((-1*(-1+(count string .fileStrct.dbDir)))#(string .fileStrct.dbDir)),"/tblProcessManager";  // tblProcessManager is in the root of the database directories. This can't be changed. 
+    $[() ~ key (hsym `$pathTblProcessManager);                                                                          // load process manager or create if it does not exist. 
+        .dbSttngs.build[];
+        load [hsym `$pathTblProcessManager]];
+    `INFO["[kxReddit][.dbSttings] pathTblProcessManager: ",pathTblProcessManager];
+    
     };
 
 // @kind function
-// @fileoverview Function creates the ProcessManager table, containing default values, with no input arguments. 
+// @fileoverview Function creates the tblProcessManager table, containing default values, with no input arguments. It puts it in the .fileStrct.dbDir directory. 
 // This table is used to control the normalising of data as it is written to disk. 
 // @returns {null} The tblProcessManager table is written to disk prior to function exiting.  
 build:{
-
-    $[() ~ key `:/import/redditdb/tblProcessManager;;system "rm /import/redditdb/tblProcessManager"];
+    pathTblProcessManager: ((-1*(-1+(count string .fileStrct.dbDir)))#(string .fileStrct.dbDir)),"/tblProcessManager";
+    $[() ~ key (hsym `$pathTblProcessManager);;system ("rm ",pathTblProcessManager)];
     
     delete tblProcessManager from `.; 
     `tblProcessManager set ([process: `$(); args:()] fn:(); note:string(); recDate:`timestamp$();recID:`guid$());
@@ -78,22 +123,20 @@ build:{
         `tbl`colmn`casting!(`RS;`score;"F");            /
         `tbl`colmn`casting!(`RS;`over_18;"B");          /
         `tbl`colmn`casting!(`RS;`stickied;"B");         /
-        `tbl`colmn`casting!(`RS;`created_utc;"P");      /
+        `tbl`colmn!`RS`created_utc;                     /
         `tbl`colmn!`RS`selftext;                        /
         `tbl`colmn!`RS`distinguished;                   /
         `tbl`colmn!`RS`subreddit;                       /
         `tbl`colmn!`RS`domain;                          /
         `tbl`colmn!`RS`subreddit_id;                    /
-        `tbl`colmn!`RS`author;                          /
-        `tbl`colmn!`RS`edited;                          /                 
+        `tbl`colmn!`RS`author;                          /            
         `tbl`colmn!`RS`title;                           /
         
         `tbl`colmn!`RC`author_flair_text;               /
         `tbl`colmn!`RC`author;                          /
         `tbl`colmn!`RC`author_flair_css_class;          /
         `tbl`colmn!`RC`id;                              /
-        `tbl`colmn!`RC`retrieved_on;                    /
-        `tbl`colmn`casting!(`RC;`edited;"B");           /
+        `tbl`colmn!`RC`retrieved_on;                    / 
         `tbl`colmn!`RC`subreddit;                       /
         `tbl`colmn!`RC`distinguished;                   /
         `tbl`colmn!`RC`parent_id;                       /
@@ -101,7 +144,8 @@ build:{
         `tbl`colmn`casting!(`RC;`controversiality;"F"); /           
         `tbl`colmn!`RC`subreddit_id;                    /
         `tbl`colmn!`RC`link_id;                         /
-        `tbl`colmn`casting!(`RC;`score;"F")             /
+        `tbl`colmn`casting!(`RC;`score;"F");            /
+        `tbl`colmn!`RC`created_utc                      /
         );
     
     fn:(
@@ -113,21 +157,20 @@ build:{
         enlist "castFn";
         enlist "castFn";
         enlist "castFn";
-        enlist "castFn";
+        enlist ".hBr.floatToDateTime";
         enlist ".hBr.cleanChar";
         enlist ".hBr.cleanChar";
         enlist ".hBr.cleanChar";
         enlist ".hBr.cleanChar";
         enlist ".hBr.cleanCharSym";
         enlist ".hBr.cleanCharSym";
-        (".hBr.falseToNull";".hBr.floatToDateTime");
         enlist ".hBr.cleanChar";
+        
         enlist ".hBr.cleanChar";
         enlist ".hBr.cleanCharSym";
         enlist ".hBr.cleanChar";
         enlist ".hBr.cleanChar";
         enlist ".hBr.floatToDateTime";
-        enlist "castFn";
         enlist ".hBr.cleanChar";
         enlist ".hBr.cleanChar";
         enlist ".hBr.cleanCharSym";
@@ -135,7 +178,8 @@ build:{
         enlist "castFn";
         enlist ".hBr.cleanCharSym";
         enlist ".hBr.cleanCharSym";
-        enlist "castFn"
+        enlist "castFn";
+        enlist ".hBr.floatToDateTime"
         );
                                                                                                                         // create a list for each column and then build a table based on those lists.
     nRows: count args;
@@ -144,7 +188,7 @@ build:{
     recDate: nRows#.z.p;
     recID:(neg nRows)?0Ng;
     `tblProcessManager upsert ([process;args]fn;note;recDate;recID);
-     save `:/import/redditdb/tblProcessManager
+     save (hsym `$pathTblProcessManager);
     };
 
 \d .

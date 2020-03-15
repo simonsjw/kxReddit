@@ -8,6 +8,16 @@
 // .hBr (homeBrew) contains tools related to manipulating data types with the intention of transforming mixed data columns to single kx compliant data types. 
 // @end
 
+// @kind function
+// @fileoverview tcf runs a function in a try catch block (with finally).
+// @param t {function} The function being run. 
+// @param c {function} A function ran when an error is 'caught'.
+// @param f {function} A function always ran after the try & catch. 
+// @return array {(string; (int))[]} an array of tuples where each sub list contains the name of a column and the data types found in that column.
+tcf:{[t;c;f]                                                                                        // https://stackoverflow.com/questions/56648511/exception-error-handling-in-q-kdb-alternative-of-try-catch-finallyjava-try/56654799#56654799
+    r:@[(1b;)value@;t;@[(1b;)c@;;(0b;)::]];
+    f[]; 
+    $[r 0;r 1;'`$r 1]}
 
 // @kind function
 // @fileoverview allColTypes returns the types of every element in each feature of the datatable.
@@ -37,14 +47,16 @@ dictToJSON:{[colmn;tbl]
     };
 
 // @kind function 
-// @fileoverview floatToDateTime takes float elements in a column and transforms them to datetime.
+// @fileoverview floatToDateTime takes a number or a number in a string elements in a column and transforms them to datetime.
 // @param column {sym} A column to be transformed.
 // @param tbl {sym} A table the column belongs to.
 // @returns {`d:table} A dictionary containing a handler for the table just modified.
 floatToDateTime:{[colmn;tbl]
 //  col (symbol) is a column in table tbl (string).
 //  This function changes floating values to an equivalent UTC date/time.
-    tbl:![tbl;();0b;(enlist colmn)!enlist (mmu;"P";(string;(mmu;"j";(tbl;enlist colmn))))];
+    $[(type tbl[colmn])~0h;
+        tbl:![tbl;();0b;(enlist colmn)!enlist (mmu;"P";(tbl;enlist colmn))];
+        tbl:![tbl;();0b;(enlist colmn)!enlist (mmu;"P";(string;(mmu;"j";(tbl;enlist colmn))))]];
     :(enlist `d)!(enlist tbl)
     };
 
@@ -52,7 +64,7 @@ floatToDateTime:{[colmn;tbl]
 // @kind function 
 // @fileoverview floatToDateTime_checked changes floating values to an equivalent UTC date/time if the UTC date/time
 //  is between 2005.01.01 and 2100.01.01. It does this by checking the first 10 values in the
-//  given table which are not null values.
+//  given table which are not null values. It does not work on floats in strings. 
 //  *******************************************************************************
 //  ** this function assumes all values are either a float or a null (0n) term.  **
 //  ** If not, apply falseToNull or similar to clean first before applying this. **

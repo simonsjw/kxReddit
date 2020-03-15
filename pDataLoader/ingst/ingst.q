@@ -43,7 +43,7 @@ ingest.SetDefaultColmns:{[dataTbl;sinkTbl;allRecs]
 ingest.setUnknownColmns:{[dataTbl;sinkTbl;allRecs]
     lstCol:raze {(count x[`fn])#x[`colmn]} each allRecs;
     lstUnknownCols:asc (cols dataTbl) where not (cols dataTbl) in lstCol;
-    `DEBUG["[kxReddit][.ingest.setUnknownColmn] Unknown columns (lstUnknownCols): ",lstUnknownCols,"."];
+    `DEBUG[raze string "[kxReddit][.ingest.setUnknownColmn] Unknown columns (lstUnknownCols): ",lstUnknownCols,"."];
     unknownsTbl:?[dataTbl;();0b;(lstUnknownCols)!(lstUnknownCols)];
     `DEBUG["[kxReddit][.ingest.setUnknownColmn] building the swamp column (undocumented fields)."];
     // Add those to dataTbl.
@@ -67,7 +67,7 @@ ingest.setUnknownColmns:{[dataTbl;sinkTbl;allRecs]
 // @param dataTbl {table} the target table being written to.
 // @return null
 ingest.writeNewDataToDisk:{[tempTbl;sinkTbl]
-    d:.fileStrct.dbdir;
+    d:.fileStrct.dbDir;
     p:`$string("m"$first ?[tempTbl;();0b;()][.dbSttngs.partitionCol[sinkTbl]]);
     y:("." vs string p)[0];
     d:hsym `$raze string d,"/",y;
