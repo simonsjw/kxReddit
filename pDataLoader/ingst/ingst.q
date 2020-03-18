@@ -73,10 +73,10 @@ ingest.writeNewDataToDisk:{[tempTbl;sinkTbl]
     d:hsym `$raze string d,"/",y;
     f:.dbSttngs.partitionCol[sinkTbl];
     t:hsym `$ raze string d,"/", p,"/",sinkTbl,"/";
-// set the sort order of the table to be laid down so that the partitioned column is up front, swamp is last and everything else is in between.
-    allCols: cols tempTbl[];
- 
-    otherCols: asc allCols where ((not (allCols = f)) and (not (allCols = `swamp)));    
+    d:hsym `$ raze string d,"/", p;                                                                // set the sym file location as within the table folder (so monthly). 
+
+    allCols: cols tempTbl[];                                    
+    otherCols: asc allCols where ((not (allCols = f)) and (not (allCols = `swamp)));               // set the sort order of the table to be laid down so that the partitioned column is up front, swamp is last and everything else is in between.
 //     otherCols: asc allCols where ((not (allCols = f)) and (not (allCols = `swamp)) and (not (allCols = `swampKeys)));
     allCols:f,otherCols,`swamp;
 //     allCols:f,otherCols,`swamp`swampKeys;

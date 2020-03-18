@@ -53,6 +53,8 @@ infltFiles:{[dir]                                                   // x is a st
 // @return null
 infltFilesRunFunc:{[dir;fn;getSinkName]                                     // x is a string representing the file name of a file in the directory dir.                                   
     fileSet: key dir;                                                       // get list of files in directory. 
+    `DEBUG["attempt permission change: sudo chown -R ubuntu:ubuntu ",(string dir) except ":"];
+    system("sudo chown -R ubuntu:ubuntu ",(string dir) except ":");         // set the import directory access rights so files can be manipulated without sudo.
     inflt:{[file;dir;fn;getSinkName]                                        // build function to inflate files using the right function for the right file type. 
             if[fExists (hsym `$(string dir),"/STOP");:`STOP];               // stop importing this file if a "STOP" file is found in the import directory (case sensitive).
             f:{[file;dir]("/" sv (string dir;(string file))) except ":"};   // function f that builds file path from host directory (dir) and given file (x).
@@ -60,7 +62,7 @@ infltFilesRunFunc:{[dir;fn;getSinkName]                                     // x
             fileName:("." vs (string file))[0];                             // get the name of the file
             fileType:("." vs (string file))[1];                             // get the type of the file
             np:f[`$fileName;dir]                                              // use f to create the unzipped file path
-            `DEBUG[raze string "[kxReddit][.fT.infltFilesRunFunc] Attempting unzip {name",fileName," type:",fileType,"}"];
+            `DEBUG[raze string "[kxReddit][.fT.infltFilesRunFunc] Attempting unzip {name: ",fileName," type: ",fileType," path: ",p,"}"];
             $[fileType~"bz2";system"bzip2 -d ",p;];                         // unzip if bz2 filepath. 
             $[fileType~"xz";system"xz -d ",p;];                              // unzip if xz filepath. 
             `DEBUG[raze string "[kxReddit][.fT.infltFilesRunFunc] Attempting to apply function. Table sink: ",getSinkName[fileName]];
@@ -72,13 +74,15 @@ infltFilesRunFunc:{[dir;fn;getSinkName]                                     // x
 
 infltFilesRunFuncTEST:{[dir]                                     // x is a string representing the file name of a file in the directory dir.                                   
     fileSet: key dir;                                                       // get list of files in directory. 
+    `DEBUG["attempt permission change: sudo chown -R ubuntu:ubuntu ",(string dir) except ":"];
+    system("sudo chown -R ubuntu:ubuntu ",(string dir) except ":"); // set the import directory access rights so files can be manipulated without sudo.
     inflt:{[file;dir]                                        // build function to inflate files using the right function for the right file type. 
             if[fExists (hsym `$(string dir),"/STOP");:`stop];               // stop importing this file if a "STOP" file is found (case sensitive).
             f:{[file;dir]("/" sv (string dir;(string file))) except ":"};   // function f that builds file path from host directory (dir) and given file (x).
             p:f[file;dir];                                                  // use f to create the file path
             fileName:("." vs (string file))[0];                             // get the name of the file
             fileType:("." vs (string file))[1];                             // get the type of the file                                             // use f to create the unzipped file path
-            `DEBUG[raze string "[kxReddit][.fT.infltFilesRunFunc] Attempting unzip {name",fileName," type:",fileType,"}"];
+            `DEBUG[raze string "[kxReddit][.fT.infltFilesRunFunc] Attempting unzip {name: ",fileName," type:",fileType," path: ",p,"}"];
             $[fileType~"bz2";0N!"bzip2 -d ",p;];                         // unzip if bz2 filepath. 
             $[fileType~"xz";0N!"xz -d ",p;];                              // unzip if xz filepath. 
         };

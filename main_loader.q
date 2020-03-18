@@ -1,6 +1,9 @@
 
 // get arguments passed at command line
 cmdArgs:.Q.opt .z.x;
+nulArg: {(x~()) or (x~(enlist ""))}  // checks that the argument wasn't passed from the command line. (docker passes "" in a list).
+0N!"inbound arguments: ";
+0N!cmdArgs;
 // accepted arguments:
 // -------------------
 // located in main_loader (here)
@@ -26,25 +29,29 @@ $[cmdArgs[`qhome]~();                                                           
 // ####################################################################################
 
 loadRel:{[qhome;relPath]
-    qhome: string qhome;
-    qhome:(-1*((count qhome)-1))#qhome;
-    relPath: string relPath;
-    relPath:(-1*((count relPath)-1))#relPath;
-    
-    sPath:"l ", ("/" sv ( qhome; relPath));
-    system sPath, .z.x 0; 
-    };
+            qhome: string qhome;
+            qhome:(-1*((count qhome)-1))#qhome;
+            relPath: string relPath;
+            relPath:(-1*((count relPath)-1))#relPath;
+
+//             sPath:"l ", ("/" sv ( qhome; relPath));
+            sPath:("/" sv ( qhome; relPath));
+//             system sPath, .z.x 0; 
+            0N!"attempting to load ", sPath;
+            system"l ",sPath; 
+            0N!"success";
+            };
 
 libPths:(hsym `$"kxReddit/libs/dbmaint/dbmaint.q";                                       
-    hsym `$"kxReddit/libs/dbSttngs/dbSttngs.q";
-    hsym `$"kxReddit/libs/fT/fT.q";
-    hsym `$"kxReddit/libs/hBr/hBr.q";
-    hsym `$"kxReddit/libs/qlog/qlog.q"
-    );
+            hsym `$"kxReddit/libs/dbSttngs/dbSttngs.q";
+            hsym `$"kxReddit/libs/fT/fT.q";
+            hsym `$"kxReddit/libs/hBr/hBr.q";
+            hsym `$"kxReddit/libs/qlog/qlog.q"
+            );
 
 prPths:(hsym `$"kxReddit/pDataLoader/ingst/ingst.q";                                    // load up the process paths relative to home. 
-    hsym `$"kxReddit/pDataLoader/pDataLoader.q"
-    );
+            hsym `$"kxReddit/pDataLoader/pDataLoader.q"
+            );
 
 loadRel[qhome;] each libPths;                                                           // load each library.
 loadRel[qhome;] each prPths;                                                            // load each method. 
@@ -58,6 +65,6 @@ if[("B"$cmdArgs[`import])~1b;
     fn:.pDataLoader.processRedditFile;                                                  // provide the function to be applied to the folder after unzipping. 
     DEBUG[raze string "[kxReddit][.pDataLoader.processRedditFile] Attempting import. {source folder ",.fileStrct.inputDir,"}"];
     .fT.infltFilesRunFunc[.fileStrct.inputDir;fn;getSinkName];
-    ]                              // Carry out the unzipping and apply hte function with argument each time. 
+    ];                              // Carry out the unzipping and apply hte function with argument each time. 
 
 
