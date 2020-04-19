@@ -1,10 +1,13 @@
 
 // get arguments passed at command line
 cmdArgs:.Q.opt .z.x;
-nulArg: {(x~()) or (x~(enlist ""))}  // checks that the argument wasn't passed from the command line. (docker passes "" in a list).
+nulArg: {(x~()) or (x~(enlist "")) or (x~0N)}  // checks that the argument wasn't passed from the command line. (docker passes "" in a list).
 0N!"inbound arguments: ";
 0N!cmdArgs;
-// accepted arguments:
+
+cmdArgs[`import]:1;
+
+// // accepted arguments:
 // -------------------
 // located in main_loader (here)
 //      `qhome                  -   filepath (string): Set location of library. ; eg. "/import/reddit"
@@ -19,14 +22,15 @@ nulArg: {(x~()) or (x~(enlist ""))}  // checks that the argument wasn't passed f
 //      `defaultSymbolRatio     -   float (string): the threshold under which a column is set to syms which are enumerated. The threshold is the ratio of number of distinct records to number of records (with nulls removed). It is used in formatting functions in .hBr (currently only cleanCharSymWTest).; eg. "0.7"
 //      
 
-
-$[cmdArgs[`qhome]~();                                                                   // set the qhome path. This is the root directory of the scripts. 
-    qhome: hsym `$"/home/simon/developer/data/workspace/__nouser__/kxReddit_local"; 
-    qhome: hsym `$args[`qhome]];
+ // set the qhome path. This is the root directory of the scripts. 
+qhome: $[nulArg cmdArgs[`qhome]; 
+    hsym `$"/home/simon/developer/data/workspace/__nouser__/kxReddit_local"; 
+    hsym `$cmdArgs[`qhome]];
 
 // ####################################################################################
 // Load filepaths relative to qhome. 
 // ####################################################################################
+
 
 loadRel:{[qhome;relPath]
             qhome: string qhome;
@@ -46,7 +50,8 @@ libPths:(hsym `$"kxReddit/libs/dbmaint/dbmaint.q";
             hsym `$"kxReddit/libs/dbSttngs/dbSttngs.q";
             hsym `$"kxReddit/libs/fT/fT.q";
             hsym `$"kxReddit/libs/hBr/hBr.q";
-            hsym `$"kxReddit/libs/qlog/qlog.q"
+            hsym `$"kxReddit/libs/qlog/qlog.q";
+            hsym `$"kxReddit/libs/sch/sch.q"
             );
 
 prPths:(hsym `$"kxReddit/pDataLoader/ingst/ingst.q";                                    // load up the process paths relative to home. 
@@ -60,7 +65,7 @@ loadRel[qhome;] each prPths;                                                    
 
 // ####################################################################################
 
-if[("B"$cmdArgs[`import])~1b;     
+if[("b"$cmdArgs[`import])~1b;     
     getSinkName:{`$x [til 2]};                                                          // build a function to profide the table sink name given an input string. 
     fn:.pDataLoader.processRedditFile;                                                  // provide the function to be applied to the folder after unzipping. 
     DEBUG[raze string "[kxReddit][.pDataLoader.processRedditFile] Attempting import. {source folder ",.fileStrct.inputDir,"}"];

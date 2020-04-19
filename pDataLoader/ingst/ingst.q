@@ -81,6 +81,9 @@ ingest.writeNewDataToDisk:{[tempTbl;sinkTbl]
     allCols:f,otherCols,`swamp;
 //     allCols:f,otherCols,`swamp`swampKeys;
     `DEBUG[raze string "[kxReddit][ingest.writeNewDataToDisk] Perform upsert of columns. {allCols:",(sv[";";string allCols]),"}"];
+    cTbl:`$("." vs string tempTbl)[2][0 1];
+    schC: .sch.checkLog[tempTbl;.dbSttngs.defaultSchemaLib[cTbl]];
+    `INFO[raze string "[kxReddit][ingest.writeNewDataToDisk] Results of schemaCheck: {",schC,"}"];
     t upsert .Q.en[d;?[tempTbl;();0b;(allCols)!(allCols)]];
     };
 

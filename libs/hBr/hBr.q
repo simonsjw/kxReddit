@@ -14,7 +14,8 @@
 // @param c {function} A function ran when an error is 'caught'.
 // @param f {function} A function always ran after the try & catch. 
 // @return array {(string; (int))[]} an array of tuples where each sub list contains the name of a column and the data types found in that column.
-tcf:{[t;c;f]                                                                                        // https://stackoverflow.com/questions/56648511/exception-error-handling-in-q-kdb-alternative-of-try-catch-finallyjava-try/56654799#56654799
+// https://stackoverflow.com/questions/56648511/exception-error-handling-in-q-kdb-alternative-of-try-catch-finallyjava-try/56654799#56654799
+tcf:{[t;c;f]                                                                                        
     r:@[(1b;)value@;t;@[(1b;)c@;;(0b;)::]];
     f[]; 
     $[r 0;r 1;'`$r 1]}

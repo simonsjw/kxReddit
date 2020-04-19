@@ -48,7 +48,7 @@
 
 dbStructure:{
     
-    .fileStrct.dbDir: $[`cmdArgs[`dbDir]~();
+    .fileStrct.dbDir: $[`nulArg `cmdArgs[`dbDir];
         hsym `$"/import/redditdb";
         hsym `$`cmdArgs[`dbDir]];                                                                                       // Note we can't log this setting until after the logger is setup. 
 
@@ -58,7 +58,7 @@ dbStructure:{
         sinkTgt:(hsym `$"";hsym `$pathLog);
         lvls:(`INFO`WARN`ERROR`FATAL`DEBUG;`INFO`WARN`ERROR`FATAL`DEBUG));
     
-    .dbSttngs.logSinks: $[`cmdArgs[`logSinks]~();
+    .dbSttngs.logSinks: $[`nulArg `cmdArgs[`logSinks];
         defaultLogSttngs;
         eval parse `cmdArgs[`logSinks]];
     .qlog.buildMap[];                                                                                                   // initialise the logger. 
@@ -66,30 +66,38 @@ dbStructure:{
     `INFO[raze "[kxReddit][.dbSttings] .fileStrct.dbDir: ",string .fileStrct.dbDir];                                    // Now log previous variables.
     `INFO["[kxReddit][.dbSttings] .dbSttngs.logSinks set."];  
     
-    .fileStrct.inputDir: $[`cmdArgs[`inputDir]~();
+    .fileStrct.inputDir: $[`nulArg `cmdArgs[`inputDir];
         hsym `$"/import";
         hsym `$`cmdArgs[`inputDir]];
     `INFO[raze "[kxReddit][.dbSttings] .fileStrct.inputDir: ", string .fileStrct.inputDir];
     
-    .dbSttngs.partitionCol: $[`cmdArgs[`partitionCol]~();
+    .dbSttngs.partitionCol: $[`nulArg `cmdArgs[`partitionCol];
         `RS`RC!`created_utc`created_utc;
         eval parse `cmdArgs[`partitionCol]];
     `INFO[raze "[kxReddit][.dbSttings] .dbSttngs.partitionCol: ", raze ("," sv string each key .dbSttngs.partitionCol),"!",("," sv string each value .dbSttngs.partitionCol)];
     
-    .dbSttngs.importChunkSize: $[`cmdArgs[`importChunkSize]~();
+    .dbSttngs.importChunkSize: $[`nulArg `cmdArgs[`importChunkSize];
         `RS`RC!(1300000;1300000);
         eval parse `cmdArgs[`importChunkSize]];
     `INFO["[kxReddit][.dbSttings] .dbSttngs.importChunkSize: ", raze ("," sv string each key .dbSttngs.importChunkSize),"!",("," sv string each value .dbSttngs.importChunkSize)];
     
-    .dbSttngs.removeCols: $[`cmdArgs[`removeCols]~();
+    .dbSttngs.removeCols: $[`nulArg `cmdArgs[`removeCols];
         `RS`RC!`none`none;
         eval parse `cmdArgs[`removeCols]];
     `INFO["[kxReddit][.dbSttings] .dbSttngs.removeCols: ", raze ("," sv string each key .dbSttngs.removeCols),"!",("," sv string each value .dbSttngs.removeCols)];
     
-    .dbSttngs.defaultSymbolRatio:$[`cmdArgs[`defaultSymbolRatio]~();
+    .dbSttngs.defaultSymbolRatio:$[`nulArg `cmdArgs[`defaultSymbolRatio];
         0.7;
         "F"$`cmdArgs[`defaultSymbolRatio]];
     `INFO["[kxReddit][.dbSttings] .dbSttngs.defaultSymbolRatio: ",string .dbSttngs.defaultSymbolRatio];
+    
+    schRC:([c:`author`author_flair_css_class`author_flair_text`body`controversiality`created_utc`distinguished`id`link_id`parent_id`retrieved_on`score`subreddit`subreddit_id`swamp]
+            t:"sCCCfpCCsspfCs ";f:```````````````;a:```````````````);
+    
+    schRS:([c:`author`author_flair_css_class`author_flair_text`created_utc`distinguished`domain`link_flair_css_class`link_flair_text`num_comments`over_18`score`selftext`stickied`subreddit`subreddit_id`title`swamp]
+            t:"sCCpCCCCfbfCbCsC ";f:`````````````````;a:`````````````````);
+    
+    .dbSttngs.defaultSchemaLib:(`RC`RS)!(schRC;schRS);
 
     pathTblProcessManager: ((-1*(-1+(count string .fileStrct.dbDir)))#(string .fileStrct.dbDir)),"/tblProcessManager";  // tblProcessManager is in the root of the database directories. This can't be changed. 
     $[() ~ key (hsym `$pathTblProcessManager);                                                                          // load process manager or create if it does not exist. 

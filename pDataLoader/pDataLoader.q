@@ -35,7 +35,7 @@ importData:{[tempTbl;sinkTbl]
 // @return sinkTbl {symbol} the table where the chunk of data is saved.
 GetPartLsts: {[inlst;sinkTbl]
     `DEBUG[raze string "[kxReddit] Create the unique symbol to hold the table. {sinkTbl:", sinkTbl,"}"];
-    tmpname: (string sinkTbl),"__",(string first -1?0Ng);
+    tmpname: (string sinkTbl),"__",(string `itt[]),"_",(string first -1?0Ng);
     .tmp.importTbl:`$".tmp.",tmpname;   
     `DEBUG[raze string "[kxReddit] Create an empty table.{.tmp.importTbl:",.tmp.importTbl,"}"];
     .tmp.importTbl set flip (distinct (raze key each inlst))!();                      
@@ -58,8 +58,11 @@ GetPartLsts: {[inlst;sinkTbl]
 // @param inlst {symbol} the chunk of data
 // @return sinkTbl {symbol} the table where the chunk of data is saved.
 ItterGetLst:{[x;sinkTbl]
-    lst:: .j.k each x; 
+    lst:: .j.k each x;   
+    `DEBUG["[kxReddit][.pDataLoader.ItterGetLst] Attempt import of chunk ",(string`itt[])," first of ", (string count x)," lines:"];
+    `DEBUG[raze string x[0]];
     .pDataLoader.GetPartLsts[lst;sinkTbl];
+    `itt set `itt[]+1;
     };
 
 // @kind function
@@ -73,6 +76,7 @@ processRedditFile:{[source;sinkTbl]
     `DEBUG["[kxReddit][.fT.fExists .fT.nukeDir] If the file exists then delete it."];
     $[.fT.fExists[pFilePath];.fT.nukeDir[pFilePath];];
     `DEBUG["[kxReddit][.pDataLoader.ItterGetLst] receiving a set of JSON data no more than ",(string .dbSttngs.importChunkSize[sinkTbl])," bits for table ", string sinkTbl];
+    `itt set 0;
     .Q.fsn[.pDataLoader.ItterGetLst[;sinkTbl];source;.dbSttngs.importChunkSize[sinkTbl]];                               // .Q.fsn takes a big file (given in the second argument) and breaks it into chunks not bigger than the 3rd
     };                                                                                                                  // argument by going to the first \n found before going over that 3rd argument size. It then passes each chunk to the function defined in the first argument. 
                                                                                                                         // Each 'chunk' is a vector of elements delimited by \n. Here tVals itterates (I did not say loops!) over that \n delimited vector of elements.

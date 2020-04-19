@@ -25,12 +25,35 @@ check:{[tbl;schema]
     :(
         (`$"+"; `$"-";`$"?")!
         (
-            enlist ((0!mTbl)[`c]) where (not {[x;tbl]x in (0!tbl)[`c]}[;schema] each (0!mTbl)[`c]);
-            enlist ((0!schema)[`c]) where (not {[x;tbl]x in (0!tbl)[`c]}[;mTbl] each (0!schema)[`c]);
-            enlist (clst)!({[x;tbl;schTbl](tbl[x[0]][x[1]];schTbl[x[0]][x[1]])}[;mTbl;schema] each clst))
+            ((0!mTbl)[`c]) where (not {[x;tbl]x in (0!tbl)[`c]}[;schema] each (0!mTbl)[`c]);
+            ((0!schema)[`c]) where (not {[x;tbl]x in (0!tbl)[`c]}[;mTbl] each (0!schema)[`c]);
+            (clst)!({[x;tbl;schTbl](tbl[x[0]][x[1]];schTbl[x[0]][x[1]])}[;mTbl;schema] each clst)
+            )
         );
 
     }
+
+// @kind function
+// @fileoverview .sch.checkLog uses .sch.check but outputs information as a string for use in log messages. See .sch.check to understand the string output. 
+// @desc LogString - the comparison from .sch.checkLog as a string for use in logs. 
+// @param tbl {table} the table to be tested.
+// @param schema {table} the expected schema of the table.
+// @example schema
+// testT: `colB xasc ([]colA:`w`e`r`t;colB:("never";"say";"never";"again");colC:1 2 3 4;
+//     colD:("a";"b";"c";"d");
+//     colG:(`a`b!(34;45);`a`b!(34;45);`a`b!(34;45);`a`b!(34;45));
+//     colH:(`a`b!((1;2;3);(2;1;3));`a`b!((1;2;3);(2;1;3));`a`b!((1;2;3);(2;1;3));`a`b!((1;2;3);(2;1;3)));
+//     colI:(enlist `a`b!((1;2;3);(2;1;3));enlist `a`b!((1;2;3);(2;1;3));enlist `a`b!((1;2;3);(2;1;3));enlist `a`b!((1;2;3);(2;1;3)))
+//     );
+//
+// schema:([c:`colA`colC`colD`colE`colF`colG`colH`colI]t:("sjcFB   ");f:````````;a:`s```````);
+//
+// .sch.checkLog[`testT;schema];
+checkLog:{[tbl;schema]
+    dif: .sch.check[tbl;schema];
+    ("+:",("," sv (string dif[`$"+"])),"; -:"),("," sv (string dif[`$"-"])),"; ?:(",(";" sv ({":" sv (string  x)} each key dif[`$"?"])),")!(",(";" sv ({":" sv (string  x)} each value dif[`$"?"])),")"
+    }
+
 \d .
 
 
