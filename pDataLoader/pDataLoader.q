@@ -59,8 +59,10 @@ GetPartLsts: {[inlst;sinkTbl]
 // @return sinkTbl {symbol} the table where the chunk of data is saved.
 ItterGetLst:{[x;sinkTbl]
     lst:: .j.k each x;   
-    `DEBUG["[kxReddit][.pDataLoader.ItterGetLst] Attempt import of chunk ",(string`itt[])," first of ", (string count x)," lines:"];
-    `DEBUG[raze string x[0]];
+    `DEBUG["[kxReddit][.pDataLoader.ItterGetLst] Attempt import of chunk ",(string`itt[]),". First of ", (string count x)," lines follows:"];
+    `debugCache set x[0];
+    dic: .j.k x[0];
+    `DEBUG[";"sv {[x;dic](string x),":",(raze string dic[x])}[;dic] each (key dic)];
     .pDataLoader.GetPartLsts[lst;sinkTbl];
     `itt set `itt[]+1;
     };

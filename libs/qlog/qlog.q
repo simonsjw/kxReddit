@@ -28,7 +28,7 @@ logger[`pStd]:{[x;y;z]                                                          
 logger[`pConsole]:{[x;y;z]0N! raze ("[",(string x),"]: ",string .z.P," ",y)};                                       // create `pConsole - a prototype function logging messages to the console.
 logger[`pSystemD]:{[x;y;z]                                                                                          // create `pSystemD - a prototype function logging to journalctl in systemD for integration with Linux system logging. 
     SystemDLogState:`SILENT`DEBUG`INFO`WARN`ERROR`FATAL!("debug";"debug";"info";"warning";"err";"err");
-    system "logger -p local0.",SystemDLogState[x]," '",y,"'"};
+    system "logger -p local0.",SystemDLogState[x]," \"",y,"\"";};
 
 // @kind function 
 // @fileoverview buildMap builds a static logging function from settings given in .dbSettings.logSinks
