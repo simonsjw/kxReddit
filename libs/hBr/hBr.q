@@ -21,6 +21,14 @@ tcf:{[t;c;f]
     $[r 0;r 1;'`$r 1]}
 
 // @kind function
+// @fileoverview cml takes a string with spaces and returns a string without spaces in camel case. 
+// @param str {string} The string to be camel cased. 
+// @return lstr {string} The string in camel case.
+cml:{[str]
+    lstr: lower str;lstr[(lstr ss " ")+1]:upper str[(str ss " ")+1];lstr:ssr[lstr;" ";""]
+    }
+
+// @kind function
 // @fileoverview allColTypes returns the types of every element in each feature of the datatable.
 // @param x {table} A table to be analysed
 // @return array {(string; (int))[]} an array of tuples where each sub list contains the name of a column and the data types found in that column.
